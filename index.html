@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lock In Dash</title>
+<style>
+:root{--bg:#08111f;--panel:#101e33;--ink:#edf6ff;--accent:#70f0a8;--danger:#ff6378}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 50% 15%,#183860 0,#08111f 55%);font-family:system-ui,sans-serif;color:var(--ink)}main{width:min(92vw,440px);text-align:center}h1{margin:0;font-size:2.2rem;letter-spacing:.04em}.sub{opacity:.72;margin:.25rem 0 1rem}.hud{display:flex;justify-content:space-between;background:var(--panel);border:1px solid #294665;border-radius:14px;padding:.65rem 1rem;margin-bottom:.75rem;font-weight:700}canvas{width:100%;aspect-ratio:1/1;background:linear-gradient(#0d2035,#08111f);border:2px solid #3d658d;border-radius:18px;touch-action:none;box-shadow:0 16px 45px #0008}button{margin-top:1rem;border:0;border-radius:99px;padding:.85rem 1.5rem;background:var(--accent);color:#062016;font-weight:900;font-size:1rem;cursor:pointer}button:hover{filter:brightness(1.1)}.tip{font-size:.85rem;opacity:.7;margin:.7rem}
+</style>
+</head>
+<body><main>
+<h1>LOCK IN DASH</h1><p class="sub">Esquiva distracciones. Farma aura.</p>
+<div class="hud"><span>⚡ <b id="score">0</b></span><span>🏆 <b id="best">0</b></span><span>❤️ <b id="lives">3</b></span></div>
+<canvas id="game" width="420" height="420"></canvas><br><button id="start">EMPEZAR</button><p class="tip">Mueve con ← →, A/D o arrastrando. En celular: toca a los lados.</p>
+</main><script>
+const c=document.querySelector('#game'),x=c.getContext('2d'),W=c.width,H=c.height;let p,obs,score,lives,run,frame,best=+localStorage.lockBest||0;bestEl=best;const $=id=>document.getElementById(id),scoreEl=$('score'),bestEl=$('best'),livesEl=$('lives');bestEl.textContent=best;
+function reset(){p={x:W/2,y:H-48,w:44,h:16};obs=[];score=0;lives=3;frame=0;run=true;ui();requestAnimationFrame(loop)}function ui(){scoreEl.textContent=score; livesEl.textContent=lives;bestEl.textContent=best}
+function rect(o,col){x.fillStyle=col;x.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h)}function loop(){if(!run)return;frame++;x.clearRect(0,0,W,H);x.fillStyle='#c7e4ff';x.font='18px system-ui';x.fillText('FOCO',12,26);rect(p,'#70f0a8');x.fillStyle='#09291a';x.fillRect(p.x-5,p.y-2,10,4);if(frame%Math.max(18,55-Math.floor(score/5))===0)obs.push({x:25+Math.random()*(W-50),y:-18,w:22+Math.random()*28,h:20+Math.random()*18,v:2.2+Math.random()*2+score/40});for(let i=obs.length-1;i>=0;i--){let o=obs[i];o.y+=o.v;rect(o,'#ff6378');x.fillStyle='#fff';x.font='10px system-ui';x.fillText(['CHAT','PING','PROCR','REEL'][i%4],o.x-o.w/2+2,o.y+3);if(Math.abs(o.x-p.x)<(o.w+p.w)/2&&Math.abs(o.y-p.y)<(o.h+p.h)/2){obs.splice(i,1);lives--;if(!lives){run=false;document.querySelector('#start').textContent='REINTENTAR';break}}else if(o.y>H+30){obs.splice(i,1);score++;if(score>best){best=score;localStorage.lockBest=best}ui()}}ui();if(run)requestAnimationFrame(loop)}
+function move(clientX){const r=c.getBoundingClientRect();p.x=Math.max(p.w/2,Math.min(W-p.w/2,(clientX-r.left)*W/r.width))}addEventListener('keydown',e=>{if(!run)return;if(e.key==='ArrowLeft'||e.key==='a')p.x=Math.max(p.w/2,p.x-28);if(e.key==='ArrowRight'||e.key==='d')p.x=Math.min(W-p.w/2,p.x+28)});c.addEventListener('pointermove',e=>{if(e.buttons&&run)move(e.clientX)});c.addEventListener('pointerdown',e=>{if(run)move(e.clientX)});$('start').onclick=()=>{if(!run)reset()};x.fillStyle='#bcd5f0';x.font='bold 28px system-ui';x.textAlign='center';x.fillText('DALE A EMPEZAR',W/2,H/2);x.textAlign='left';
+</script></body></html>
